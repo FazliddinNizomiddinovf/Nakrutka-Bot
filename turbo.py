@@ -1,8 +1,8 @@
-TOKEN = "8708315455:AAFtMZ850ApwugkvjmyuVKdQVIc8bUriKSY"  # ⚠️ BotFather token
 import telebot
 import sqlite3
 from telebot.types import *
 
+TOKEN = "8708315455:AAElukbDkSULZreTKOCqG1cJmqWFsO7y2mc"  # ⚠️ BotFather token
 ADMIN_ID = 8440344034
 
 # 👇 KANAL
