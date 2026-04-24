@@ -217,56 +217,81 @@ def get_receipt(m, amount):
 # ================= CALLBACK =================
 @bot.callback_query_handler(func=lambda c: True)
 def call(c):
-    cur = get_cursor()
 
-    if not check_sub(c.from_user.id):
-        bot.answer_callback_query(c.id, "❗ Obuna bo‘ling!")
-        bot.send_message(
-            c.message.chat.id,
-            "❗ Kanalga kiring:",
-            reply_markup=sub_keyboard()
-        )
-        return
-
+    # CHECK SUB
     if c.data == "check_sub":
         if check_sub(c.from_user.id):
             bot.delete_message(c.message.chat.id, c.message.message_id)
-
-            bot.send_message(c.message.chat.id, "✅ Obunangiz tasdiqlandi. Bosh menyudasiz!", reply_markup=menu())
+            bot.send_message(c.message.chat.id, "✅ Obuna tasdiqlandi!", reply_markup=menu())
         else:
-            bot.answer_callback_query(c.id, "❌ Hali obuna yo‘q")
+            bot.answer_callback_query(c.id, "❌ Obuna yo‘q")
         return
 
-    if c.data.startswith("ok_"):
-        pay_id = int(c.data.split("_")[1])
-
-        cur.execute("SELECT user_id, amount FROM payments WHERE id=?", (pay_id,))
-        data = cur.fetchone()
-
-        if data:
-            user_id, amount = data
-
-            cur.execute("UPDATE users SET balance = balance + ? WHERE user_id=?", (amount, user_id))
-            cur.execute("UPDATE payments SET status='done' WHERE id=?", (pay_id,))
-            conn.commit()
-
-            bot.send_message(user_id, f"✅ +{amount} qo‘shildi")
-            bot.answer_callback_query(c.id, "Tasdiqlandi")
-
-    elif c.data.startswith("no_"):
-        pay_id = int(c.data.split("_")[1])
-
-        cur.execute("UPDATE payments SET status='cancel' WHERE id=?", (pay_id,))
-        conn.commit()
-
-        bot.answer_callback_query(c.id, "❌ Bekor qilindi")
-
+    # ================= INSTAGRAM =================
     elif c.data == "insta":
-        bot.edit_message_text("📸 Instagram xizmatlari", c.message.chat.id, c.message.message_id)
 
+        kb = InlineKeyboardMarkup(row_width=2)
+
+        kb.add(
+            InlineKeyboardButton("👥 Obunachi", callback_data="insta_sub")
+        )
+
+        kb.add(
+            InlineKeyboardButton("👀 Prosmotr", callback_data="insta_view")
+        )
+
+        kb.add(
+            InlineKeyboardButton("❤️ Like", callback_data="insta_like")
+        )
+
+        kb.add(
+            InlineKeyboardButton("⬅️ Orqaga", callback_data="back_services")
+        )
+
+        bot.edit_message_text(
+            "📸 Instagram bo‘limiga xush kelibsiz!\n 📋 Kerakli xizmat turini tanlang:",
+            c.message.chat.id,
+            c.message.message_id,
+            reply_markup=kb
+        )
+        return
+
+    # ================= TELEGRAM =================
     elif c.data == "tg":
-        bot.edit_message_text("💬 Telegram xizmatlari", c.message.chat.id, c.message.message_id)
 
+        kb = InlineKeyboardMarkup(row_width=2)
+
+        kb.add(
+            InlineKeyboardButton("👥 Obunachi", callback_data="tg_sub")
+        )
+
+        kb.add(
+            InlineKeyboardButton("👀 Prosmotr", callback_data="tg_view")
+        )
+
+        kb.add(
+            InlineKeyboardButton("", callback_data="tg_view")
+        )
+
+        kb.add(
+            InlineKeyboardButton("⬅️ Orqaga", callback_data="back_services")
+        )
+
+
+
+        bot.edit_message_text(
+    "💬 <b>Telegram bo‘limiga xush kelibsiz!</b>\n\n📋 Kerakli xizmat turini tanlang:",
+    c.message.chat.id,
+    c.message.message_id,
+    reply_markup=kb,
+    parse_mode="HTML"
+)
+        return
+
+    # ================= ACTIONS =================
+    elif c.data in ["insta_sub", "insta_view", "insta_like",
+                    "tg_sub", "tg_view", "tg_like"]:
+        bot.answer_callback_query(c.id, "✅ Xizmat tanlandi")
 # ================= RUN =================
 print("🚀 BOT ISHLAYAPTI")
 
