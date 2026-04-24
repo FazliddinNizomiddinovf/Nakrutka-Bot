@@ -2,8 +2,8 @@ import telebot
 import sqlite3
 from telebot.types import *
 
-TOKEN = "8708315455:AAElukbDkSULZreTKOCqG1cJmqWFsO7y2mc"  # ⚠️ BotFather token
-ADMIN_ID = 8440344034
+TOKEN = os.getenv("BOT_TOKEN")
+ADMIN_ID = int(os.getenv("ADMIN_ID"))
 
 # 👇 KANAL
 CHANNELS = ["@Fazliddin_Nizomiddinovf", "@oq_qorafonli_rasmlar_011_012"]
